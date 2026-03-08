@@ -1,4 +1,4 @@
-FROM golang:1.26.1-alpine3.23
+FROM golang:1.26.1-alpine3.23 as builder
 
 WORKDIR /app
 
@@ -8,5 +8,12 @@ RUN go mod download
 
 COPY . .
 
-CMD ["go","run", "main.go"]
+RUN go build -o magic-stream-server .
 
+FROM scratch
+
+COPY --from=builder /app/magic-stream-server /magic-stream-server
+
+EXPOSE 8080
+
+CMD ["./magic-stream-server"]
