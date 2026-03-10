@@ -1,0 +1,34 @@
+services:
+  client:
+    build:
+      context: ./Client/magic-stream-client
+      # container_name: magic-stream-client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+    restart: unless-stopped 
+  server:
+    build:
+      context: ./Server/MagicStreamServer
+      # container_name: magic-stream-server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      SECRET_KEY: "${SECRET_KEY}"
+      REFRESH_TOKEN_SECRET_KEY: "${REFRESH_TOKEN_SECRET_KEY}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      BASE_PROMPT_TEMPLATE: >
+        return a response using one of these words: {rankings}. 
+        The response should be a single word and should not contain any other text. 
+        The response should be based on the following review:
+      RECOMMENDED_MOVIE_LIMITS: "5"
+      MONGODB_URI: "mongodb://host.docker.internal:27017"
+      DATABASE_NAME: "MagicStreamApp"
+      ALLOWED_ORIGINS: "${ALLOWED_ORIGINS}"
+
+    restart: unless-stopped
+  
