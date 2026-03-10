@@ -10,6 +10,8 @@ services:
       - VITE_API_BASE_URL=http://localhost:8080
     restart: unless-stopped 
   server:
+    depends_on:
+      - db
     build:
       context: ./Server/MagicStreamServer
       # container_name: magic-stream-server
@@ -31,4 +33,31 @@ services:
       ALLOWED_ORIGINS: "${ALLOWED_ORIGINS}"
 
     restart: unless-stopped
-  
+  db:
+    image: mongo:6.0
+    container_name: magic-stream-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - movies:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 4
+      start_period: 30s
+    restart: unless-stopped
+
+  seed:
+    image: mongo:6.0
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./seed:/seed-data
+    command: 
+      mongosh mongodb://db:27017/MagicStreamApp /seed-data/seed.js  
+    restart: "no"
+
+volumes:
+  movies: {}

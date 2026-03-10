@@ -3,7 +3,9 @@ import axios from 'axios';
 
 import useAuth from './useAuth';
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL;
+// const apiUrl = import.meta.env.VITE_API_BASE_URL;
+const apiUrl = window.__ENV__?.API_BASE_URL;
+
 
 const useAxiosPrivate = () =>{
 
